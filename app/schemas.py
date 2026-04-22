@@ -35,3 +35,8 @@ class PaymentDetailResponse(BaseModel):
     processed_at: datetime | None
 
     model_config = {"from_attributes": True}
+
+
+class PaymentEvent(BaseModel):
+    payment_id: UUID
+    webhook_url: str
