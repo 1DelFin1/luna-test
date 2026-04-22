@@ -22,6 +22,19 @@ class PostgresConfig(BaseModel):
         )
 
 
+class RabbitMQConfig(BaseModel):
+    HOST: str
+    PORT: int = 5672
+    USERNAME: str
+    PASSWORD: str
+    VHOST: str = "/"
+
+    @computed_field
+    @property
+    def URL(self) -> str:
+        return f"amqp://{self.USERNAME}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.VHOST}"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -31,5 +44,8 @@ class Settings(BaseSettings):
     )
 
     postgres_db: PostgresConfig
+    rabbitmq: RabbitMQConfig
+    api_key: str
+
 
 settings = Settings()
