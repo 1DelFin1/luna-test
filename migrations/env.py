@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from app.models.payment import Payment # noqa
+import app.models  # noqa — registers Payment and OutboxEvent with Base.metadata
 from app.core.database import Base
 from app.core.config import settings
 

@@ -1,0 +1,3 @@
+from app.broker.setup import PAYMENTS_EXCHANGE, PAYMENTS_QUEUE, DLX, DLQ
+
+__all__ = ["PAYMENTS_EXCHANGE", "PAYMENTS_QUEUE", "DLX", "DLQ"]
