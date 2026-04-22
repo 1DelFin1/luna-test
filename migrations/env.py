@@ -16,7 +16,7 @@ from app.core.config import settings
 config = context.config
 
 # section = config.config_ini_section
-config.set_main_option("sqlalchemy.url", str(settings.pg_database.URL))
+config.set_main_option("sqlalchemy.url", str(settings.postgres_db.URL))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
