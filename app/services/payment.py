@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.outbox import OutboxEvent
 from app.models.payment import Payment
 from app.schemas import CreatePaymentRequest, PaymentCreatedResponse, PaymentDetailResponse
 
@@ -36,6 +37,16 @@ class PaymentService:
             idempotency_key=idempotency_key,
         )
         session.add(payment)
+
+        outbox_event = OutboxEvent(
+            event_type="payment.created",
+            payload={
+                "payment_id": str(payment.id),
+                "webhook_url": body.webhook_url,
+            },
+        )
+        session.add(outbox_event)
+
         await session.commit()
         await session.refresh(payment)
 
