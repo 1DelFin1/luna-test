@@ -7,9 +7,13 @@ services:
       - .env
     ports:
       - "8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
     networks:
       - backend_network
-
 
   db:
     image: "postgres:17"
@@ -23,12 +27,44 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_DB__PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB__DATABASE}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_DB__USERNAME} -d ${POSTGRES_DB__DATABASE}" ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_DB__USERNAME} -d ${POSTGRES_DB__DATABASE}"]
       interval: 5s
       timeout: 5s
       retries: 5
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend_network
+
+  rabbitmq:
+    image: "rabbitmq:3.13-management"
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    env_file:
+      - .env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ__USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ__PASSWORD}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend_network
+
+  worker:
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    env_file:
+      - .env
+    command: faststream run app.worker:app
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     networks:
       - backend_network
 
