@@ -8,8 +8,6 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      migrate:
-        condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
     networks:

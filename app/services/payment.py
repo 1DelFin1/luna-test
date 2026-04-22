@@ -1,4 +1,4 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
@@ -29,6 +29,7 @@ class PaymentService:
             )
 
         payment = Payment(
+            id=uuid4(),
             total=body.total,
             currency=body.currency,
             description=body.description,
